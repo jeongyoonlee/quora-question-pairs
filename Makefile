@@ -13,13 +13,14 @@ DIR_BLEND := $(DIR_BUILD)/blend
 DIR_FEATURE := $(DIR_BUILD)/feature
 DIR_METRIC := $(DIR_BUILD)/metric
 DIR_MODEL := $(DIR_BUILD)/model
+DIR_SUB := $(DIR_BUILD)/sub
 
 # directories for the cross validation and ensembling
 DIR_VAL := $(DIR_BUILD)/val
 DIR_TST := $(DIR_BUILD)/tst
 
 DIRS := $(DIR_DATA) $(DIR_BUILD) $(DIR_FEATURE) $(DIR_METRIC) $(DIR_MODEL) \
-        $(DIR_VAL) $(DIR_TST) $(DIR_BIN) $(DIR_BLEND)
+        $(DIR_VAL) $(DIR_TST) $(DIR_BIN) $(DIR_BLEND) $(DIR_SUB)
 
 # data files for training and predict
 DATA_TRN = $(DIR_DATA)/train.csv
@@ -47,12 +48,11 @@ $(ID_TST): $(SAMPLE_SUBMISSION)
 $(Y_TST): $(SAMPLE_SUBMISSION) | $(DIR_FEATURE)
 	cut -d, -f2 $< | tail -n +2 > $@
 
-$(Y_TRN): $(DATA_TRN) | $(DIR_FEATURE)
-	cut -d, -f6 $< | tail -n +2 > $@
-
-$(CV_ID): $(DATA_TRN) | $(DIR_FEATURE)
+$(CV_ID) $(Y_TRN): $(DATA_TRN) | $(DIR_FEATURE)
 	python ./src/cal_cv.py --input $< \
-                           --cv $@
+                           --cv $(CV_ID) \
+                           --ytrn $(Y_TRN)
+
 
 # cleanup
 clean::

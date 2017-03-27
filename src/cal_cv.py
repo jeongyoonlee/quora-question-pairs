@@ -14,6 +14,8 @@ if __name__ == '__main__':
                         dest='input_file')
     parser.add_argument('--cv', '-c', required=True,
                         dest='cv_file')
+    parser.add_argument('--ytrn', '-y', required=True,
+                        dest='ytrn_file')
     args = parser.parse_args()
 
     df = pd.read_csv(args.input_file)
@@ -25,3 +27,4 @@ if __name__ == '__main__':
         cv_id[i_val] = i
 
     np.savetxt(args.cv_file, cv_id, fmt='%d')
+    np.savetxt(args.ytrn_file, y, fmt='%d')
