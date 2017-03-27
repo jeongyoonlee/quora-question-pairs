@@ -21,7 +21,7 @@ if __name__ == '__main__':
 
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=SEED)
     cv_id = np.zeros_like(y, dtype=int)
-    for i, (i_trn, i_val) in enumerate(cv.split(trn, y), 1):
+    for i, (i_trn, i_val) in enumerate(cv.split(df, y), 1):
         cv_id[i_val] = i
 
-    np.savetxt(cv_file, cv_id, fmt='%d')
+    np.savetxt(args.cv_file, cv_id, fmt='%d')
