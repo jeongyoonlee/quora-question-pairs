@@ -1,6 +1,6 @@
 include Makefile.feature.h1
 
-N = 1000
+N = 5000
 DEPTH = 5
 LRATE = 0.1
 SUBCOL = 1
@@ -15,7 +15,7 @@ PREDICT_VAL := $(DIR_VAL)/$(MODEL_NAME).val.yht
 PREDICT_TST := $(DIR_TST)/$(MODEL_NAME).tst.yht
 METRIC_VAL := $(DIR_METRIC)/$(MODEL_NAME).val.txt
 
-SUBMISSION_TST := $(DIR_TST)/$(MODEL_NAME).sub.csv
+SUBMISSION_TST := $(DIR_SUB)/$(MODEL_NAME).sub.csv
 SUBMISSION_TST_GZ := $(DIR_TST)/$(MODEL_NAME).sub.csv.gz
 
 all: validation submission
@@ -42,6 +42,12 @@ $(PREDICT_VAL) $(PREDICT_TST): $(FEATURE_TRN) $(FEATURE_TST) $(CV_ID) \
 
 $(SUBMISSION_TST_GZ): $(SUBMISSION_TST)
 	gzip $<
+
+$(SUBMISSION_TST): $(PREDICT_TST) $(HEADER) $(ID_TST) | $(DIR_SUB)
+	paste -d, $(lastword $^) $< > $@.tmp
+	cat $(word 2, $^) $@.tmp > $@
+	rm $@.tmp
+
 
 $(METRIC_VAL): $(PREDICT_VAL) $(Y_TRN) | $(DIR_METRIC)
 	python ./src/evaluate.py --predict-file $< \
