@@ -1,0 +1,57 @@
+include Makefile.feature.h1
+
+N = 1000
+DEPTH = 5
+LRATE = 0.1
+SUBCOL = 1
+SUBROW = 0.7
+SUBLEV = 0.7
+WEIGHT = 100
+N_STOP = 100
+ALGO_NAME := xg_$(N)_$(DEPTH)_$(LRATE)_$(SUBCOL)_$(SUBLEV)_$(WEIGHT)_$(N_STOP)
+MODEL_NAME := $(ALGO_NAME)_$(FEATURE_NAME)
+
+PREDICT_VAL := $(DIR_VAL)/$(MODEL_NAME).val.yht
+PREDICT_TST := $(DIR_TST)/$(MODEL_NAME).tst.yht
+METRIC_VAL := $(DIR_METRIC)/$(MODEL_NAME).val.txt
+
+SUBMISSION_TST := $(DIR_TST)/$(MODEL_NAME).sub.csv
+SUBMISSION_TST_GZ := $(DIR_TST)/$(MODEL_NAME).sub.csv.gz
+
+all: validation submission
+validation: $(METRIC_VAL)
+submission: $(SUBMISSION_TST)
+retrain: clean_$(ALGO_NAME) submission
+
+$(PREDICT_VAL) $(PREDICT_TST): $(FEATURE_TRN) $(FEATURE_TST) $(CV_ID) \
+                                   | $(DIR_VAL) $(DIR_TST)
+	python ./src/train_predict_xg.py --train-file $< \
+                              --test-file $(word 2, $^) \
+                              --predict-valid-file $(PREDICT_VAL) \
+                              --predict-test-file $(PREDICT_TST) \
+                              --depth $(DEPTH) \
+                              --lrate $(LRATE) \
+                              --n-est $(N) \
+                              --subcol $(SUBCOL) \
+                              --subrow $(SUBROW) \
+                              --sublev $(SUBLEV) \
+                              --weight $(WEIGHT) \
+                              --early-stop $(N_STOP) \
+                              --cv-id $(lastword $^) > $(PREDICT_TST).log
+
+
+$(SUBMISSION_TST_GZ): $(SUBMISSION_TST)
+	gzip $<
+
+$(METRIC_VAL): $(PREDICT_VAL) $(Y_TRN) | $(DIR_METRIC)
+	python ./src/evaluate.py --predict-file $< \
+                              --target-file $(word 2, $^) > $@
+	cat $@
+
+clean:: clean_$(ALGO_NAME)
+
+clean_$(ALGO_NAME):
+	-rm $(METRIC_VAL) $(PREDICT_VAL) $(PREDICT_TST) $(SUBMISSION_TST)
+	find . -name '*.pyc' -delete
+
+.DEFAULT_GOAL := all
