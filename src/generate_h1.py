@@ -14,6 +14,8 @@ from sklearn.model_selection import StratifiedKFold
 from nltk.corpus import stopwords
 from kaggler.data_io import load_data, save_data
 from collections import Counter
+from utils.phrase_vector import PhraseVector
+from fuzzywuzzy import fuzz
 
 """https://www.kaggle.com/woters/quora-question-pairs/xgb-starter-12357"""
 
@@ -94,6 +96,27 @@ def generate_h1(train_file, test_file,
     x['avg_world_len2'] = x['len_char_q2'] / x['len_word_q2']
     x['diff_avg_word'] = x['avg_world_len1'] - x['avg_world_len2']
 
+    x['fuzz_qratio'] = df.apply(lambda x: fuzz.QRatio(str(x['question1']), str(x['question2'])), axis=1)
+
+    x['fuzz_WRatio'] =df.apply(lambda x: fuzz.WRatio(str(x['question1']), str(x['question2'])), axis=1)
+
+    x['fuzz_partial_ratio'] = df.apply(lambda x: fuzz.partial_ratio(str(x['question1']), str(x['question2'])),
+                                            axis=1)
+
+    x['fuzz_partial_token_set_ratio'] = df.apply(
+        lambda x: fuzz.partial_token_set_ratio(str(x['question1']), str(x['question2'])), axis=1)
+
+    x['fuzz_partial_token_sort_ratio'] = df.apply(
+        lambda x: fuzz.partial_token_sort_ratio(str(x['question1']), str(x['question2'])), axis=1)
+
+    x['fuzz_token_set_ratio'] = df.apply(lambda x: fuzz.token_set_ratio(str(x['question1']), str(x['question2'])),
+                                              axis=1)
+
+    x['fuzz_token_sort_ratio'] = df.apply(
+        lambda x: fuzz.token_sort_ratio(str(x['question1']), str(x['question2'])), axis=1)
+
+    x['word2vec_similarity'] = df.apply(lambda x: PhraseVector(str(x['question1'])).CosineSimilarity(PhraseVector(str(x['question2'])).vector), axis=1)
+
    
     feature_names = list(x.columns.values)
     print("Features: {}".format(feature_names))
@@ -103,6 +126,23 @@ def generate_h1(train_file, test_file,
     x_train = x[:df_train.shape[0]]
     x_test  = x[df_train.shape[0]:]
     y_train = df_train[TARGET].values
+
+    if 1:  # Now we oversample the negative class - on your own risk of overfitting!
+        pos_train = x_train[y_train == 1]
+        neg_train = x_train[y_train == 0]
+
+        print("Oversampling started for proportion: {}".format(len(pos_train) / (len(pos_train) + len(neg_train))))
+        p = 0.165
+        scale = ((float(len(pos_train)) / (len(pos_train) + len(neg_train))) / p) - 1
+        while scale > 1:
+            neg_train = pd.concat([neg_train, neg_train])
+            scale -= 1
+        neg_train = pd.concat([neg_train, neg_train[:int(scale * len(neg_train))]])
+        print("Oversampling done, new proportion: {}".format(len(pos_train) / (len(pos_train) + len(neg_train))))
+
+        x_train = pd.concat([pos_train, neg_train])
+        y_train = (np.zeros(len(pos_train)) + 1).tolist() + np.zeros(len(neg_train)).tolist()
+        del pos_train, neg_train
 
     logging.info('saving features')
     save_data(x_train, y_train, train_feature_file)
