@@ -1,0 +1,19 @@
+include Makefile.preprocess.stem
+
+SUBFEAT_NAME = tfidf
+
+SUBFEAT_TRN_Q1 = $(DIR_FEATURE)/train_$(PROCESS_NAME)_q1_$(SUBFEAT_NAME).pkl
+SUBFEAT_TST_Q1 = $(DIR_FEATURE)/test_$(PROCESS_NAME)_q1_$(SUBFEAT_NAME).pkl
+
+SUBFEAT_TRN_Q2 = $(DIR_FEATURE)/train_$(PROCESS_NAME)_q2_$(SUBFEAT_NAME).pkl
+SUBFEAT_TST_Q2 = $(DIR_FEATURE)/test_$(PROCESS_NAME)_q2_$(SUBFEAT_NAME).pkl
+
+all: $(SUBFEAT_TRN_Q1) $(SUBFEAT_TST_Q1) $(SUBFEAT_TRN_Q2) $(SUBFEAT_TST_Q2)
+$(SUBFEAT_TST_Q1) $(SUBFEAT_TRN_Q2) $(SUBFEAT_TST_Q2): $(DATA_TRN_PRE) $(DATA_TST_PRE) | $(DIR_DATA)
+	python ./src/generate_$(SUBFEAT_NAME).py --train-file $< \
+                                  --test-file $(word 2, $^) \
+                                  --q1-train-output-file $(SUBFEAT_TRN_Q1) \
+                                  --q1-test-output-file $(SUBFEAT_TST_Q1) \
+                                  --q2-train-output-file $(SUBFEAT_TRN_Q2) \
+                                  --q2-test-output-file $(SUBFEAT_TST_Q2) \
+                                  

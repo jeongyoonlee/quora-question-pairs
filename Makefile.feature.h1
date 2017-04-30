@@ -12,7 +12,7 @@ FEATURE_MAP := $(DIR_FEATURE)/$(FEATURE_NAME).fmap
 
 all: $(FEATURE_TRN) $(FEATURE_TST) $(FEATURE_MAP)
 
-$(FEATURE_TRN) $(FEATURE_TST) $(FEATURE_MAP): $(DATA_TRN) $(DATA_TST) | $(DIR_FEATURE)
+$(FEATURE_TRN) $(FEATURE_TST): $(DATA_TRN) $(DATA_TST) | $(DIR_DATA)
 	python ./src/generate_$(FEATURE_NAME).py --train-file $< \
                                              --test-file $(lastword $^) \
                                              --train-feature-file $(FEATURE_TRN) \

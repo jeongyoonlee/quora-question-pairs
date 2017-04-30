@@ -1,0 +1,13 @@
+include Makefile.preprocess.stem
+
+SUBFEAT_NAME = interaction
+
+SUBFEAT_TRN = $(DIR_FEATURE)/train_$(PROCESS_NAME)_$(SUBFEAT_NAME).pkl
+SUBFEAT_TST = $(DIR_FEATURE)/test_$(PROCESS_NAME)_$(SUBFEAT_NAME).pkl
+
+all: $(SUBFEAT_TRN) $(SUBFEAT_TST)
+$(SUBFEAT_TRN) $(SUBFEAT_TST): $(DATA_TRN_PRE) $(DATA_TST_PRE) | $(DIR_DATA)
+	python ./src/generate_$(SUBFEAT_NAME).py --train-file $< \
+                                  --test-file $(word 2, $^) \
+                                  --train-output-file $(SUBFEAT_TRN) \
+                                  --test-output-file $(SUBFEAT_TST)
