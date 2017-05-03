@@ -5,6 +5,7 @@ from sklearn.decomposition import TruncatedSVD,PCA
 from sklearn.metrics.pairwise import cosine_similarity, pairwise_distances
 from sklearn.feature_extraction.text import TfidfVectorizer
 import argparse
+from kaggler.data_io import load_data, save_data
 
 from const import SEED
 np.random.seed(SEED)
@@ -33,9 +34,9 @@ if __name__ == '__main__':
     feats.append('question_intersection')
 
     print('Generate porter intersection')
-    train['question_porter_intersection']train_porter_interaction = train.astype(str).apply(lambda x:calc_set_intersection(x['question1_porter'],x['question2_porter']),axis=1)
+    train['question_porter_intersection'] = train.astype(str).apply(lambda x:calc_set_intersection(x['question1_porter'],x['question2_porter']),axis=1)
     test['question_porter_intersection'] = test.astype(str).apply(lambda x:calc_set_intersection(x['question1_porter'],x['question2_porter']),axis=1)
     feats.append('question_porter_intersection')
 
-    pd.to_pickle(train[feats].values, args.train_output_file)
-    pd.to_pickle(test[feats].values, args.test_output_file)
+    save_data(train[feats].values, None, args.train_output_file)
+    save_data(test[feats].values, None, args.test_output_file)
