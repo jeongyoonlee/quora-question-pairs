@@ -5,6 +5,8 @@ from sklearn.decomposition import TruncatedSVD,PCA
 from sklearn.metrics.pairwise import cosine_similarity, pairwise_distances
 from sklearn.feature_extraction.text import TfidfVectorizer
 import distance
+from kaggler.data_io import load_data, save_data
+import argparse
 
 def str_jaccard(str1, str2):
 
@@ -59,8 +61,8 @@ if __name__ == '__main__':
     train['porter_jaccard'] = train.astype(str).apply(lambda x:str_jaccard(x['question1_porter'],x['question2_porter']),axis=1)
     test['porter_jaccard'] = test.astype(str).apply(lambda x:str_jaccard(x['question1_porter'],x['question2_porter']),axis=1)
 
-    pd.to_pickle(train[feats].values,args.train_output_file)
-    pd.to_pickle(test[feats].values,args.test_output_file)
+    save_data(train[feats].values, None, args.train_output_file)
+    save_data(test[feats].values, None, args.test_output_file)
 
 
 # print('Generate levenshtein_1')

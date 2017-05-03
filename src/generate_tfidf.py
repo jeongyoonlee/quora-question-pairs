@@ -6,6 +6,7 @@ import argparse
 
 from const import SEED
 np.random.seed(SEED)
+from kaggler.data_io import load_data, save_data
 
 
 if __name__ == '__main__':
@@ -30,7 +31,7 @@ if __name__ == '__main__':
     max_features = None
     ngram_range = (1,2)
     min_df = 3
-    print('Generate ' + args.question_col + ' tfidf')
+    print('Generate ' + str(args.question_col) + ' tfidf')
     feats = ['question1','question2']
     
     if args.question_col:
@@ -52,9 +53,9 @@ if __name__ == '__main__':
         test_tfidf = tfidfs[train.shape[0]:]
 
         if 'question1' in f:
-            pd.to_pickle(train_tfidf, args.q1_train_output_file)
-            pd.to_pickle(test_tfidf, args.q1_test_output_file)
+            save_data(train_tfidf, None, args.q1_train_output_file)
+            save_data(test_tfidf, None, args.q1_test_output_file)
         else:
-            pd.to_pickle(train_tfidf, args.q2_train_output_file)
-            pd.to_pickle(test_tfidf, args.q2_test_output_file)
+            save_data(train_tfidf, None, args.q2_train_output_file)
+            save_data(test_tfidf, None, args.q2_test_output_file)
 
