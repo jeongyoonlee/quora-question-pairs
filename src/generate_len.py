@@ -8,6 +8,8 @@ import distance
 from nltk.corpus import stopwords
 import nltk
 import argparse
+from kaggler.data_io import load_data, save_data
+
 
 def str_abs_diff_len(str1, str2):
     return abs(len(str1)-len(str2))
@@ -80,5 +82,5 @@ if __name__ == '__main__':
         test['%s_word_len'%c] = test[c].apply(lambda x:word_len(x))
         feats.append('%s_word_len'%c)
 
-    pd.to_pickle(train[feats].values,args.train_output_file)
-    pd.to_pickle(test[feats].values,args.test_output_file)
+    save_data(train[feats].values, None, args.train_output_file)
+    save_data(test[feats].values, None, args.test_output_file)

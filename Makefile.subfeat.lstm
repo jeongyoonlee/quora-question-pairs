@@ -1,6 +1,6 @@
 include Makefile.preprocess.stem
 
-SUBFEAT_NAME = interaction
+SUBFEAT_NAME = lstm
 
 SUBFEAT_TRN = $(DIR_FEATURE)/train_$(PROCESS_NAME)_$(SUBFEAT_NAME).h5
 SUBFEAT_TST = $(DIR_FEATURE)/test_$(PROCESS_NAME)_$(SUBFEAT_NAME).h5
