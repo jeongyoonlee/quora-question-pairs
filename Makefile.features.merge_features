@@ -1,0 +1,21 @@
+include Makefile
+
+FEATURE_NAME = merge
+FEATURE_TRN := $(DIR_FEATURE)/$(FEATURE_NAME).trn.sps
+FEATURE_TST := $(DIR_FEATURE)/$(FEATURE_NAME).tst.sps
+FEATURE_MAP := $(DIR_FEATURE)/$(FEATURE_NAME).fmap
+
+SUB_FEATURES = porter_distance porter_interaction
+
+all: $(merge)
+features = porter_distance porter_interaction porter_tfidf porter_len tfidf
+print-%  : ; @echo $* = $($*)
+
+trn_files = $(foreach var,$(SUB_FEATURES),$(DIR_FEATURE)/$(var).trn.sps)
+tst_files = $(foreach var,$(SUB_FEATURES),SUBFEAT_NAME=$(var);$(DIR_FEATURE)/$(var).tst.sps)
+
+subfeat_files: $(trn_files) $(tst_files)
+
+merge: subfeat_files
+	python ./src/generate_$(FEATURE_NAME) --output-file $(FEATURE_TRN)  $(trn_files)
+	python ./src/generate_$(FEATURE_NAME) --output-file $(FEATURE_TST)  $(tst_files)
