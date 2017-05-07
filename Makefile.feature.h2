@@ -7,19 +7,21 @@ FEATURE_TRN := $(DIR_FEATURE)/$(FEATURE_NAME).trn.h5
 FEATURE_TST := $(DIR_FEATURE)/$(FEATURE_NAME).tst.h5
 FEATURE_MAP := $(DIR_FEATURE)/$(FEATURE_NAME).fmap
 
-SUB_FEATURES := interaction \
-                distance \
-                q1_tfidf \
-                q2_tfidf \
-                q1_porter_tfidf \
-                q2_porter_tfidf \
-                len \
-                magic
+SUB_FEATURES := porter_interaction \
+                porter_distance \
+                porter_q1_tfidf \
+                porter_q2_tfidf \
+                porter_q1_porter_tfidf \
+                porter_q2_porter_tfidf \
+                porter_len \
+                porter_magic \
+		abhi \
+		lstm
 
 
 
-SUB_FEATURE_TRN := $(foreach m, $(SUB_FEATURES), $(DIR_FEATURE)/train_porter_$(m).h5)
-SUB_FEATURE_TST := $(foreach m, $(SUB_FEATURES), $(DIR_FEATURE)/test_porter_$(m).h5)
+SUB_FEATURE_TRN := $(foreach m, $(SUB_FEATURES), $(DIR_FEATURE)/train_$(m).h5)
+SUB_FEATURE_TST := $(foreach m, $(SUB_FEATURES), $(DIR_FEATURE)/test_$(m).h5)
 
 all: $(FEATURE_TRN) $(FEATURE_TST)
 
@@ -31,6 +33,4 @@ $(FEATURE_TRN) $(FEATURE_TST): $(DATA_TRN) $(DATA_TST) | $(DIR_FEATURE) $(DIR_DA
                                 --train-feature-file $(FEATURE_TRN) \
                                 --test-feature-file $(FEATURE_TST) \
                                 --lowest $(LOWEST)
-                                             
-
 

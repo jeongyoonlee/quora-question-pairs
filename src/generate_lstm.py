@@ -63,7 +63,6 @@ if __name__ == '__main__':
     parser.add_argument('--test-file', required=True, dest='test_file')
     parser.add_argument('--train-output-file', required=True, dest='train_output_file')
     parser.add_argument('--test-output-file', required=True, dest='test_output_file')
-    parser.add_argument('--feature-map-file', required=True, dest='feature_map_file')
     args = parser.parse_args()
 
     train = pd.read_csv(args.train_file).astype(str)
@@ -73,7 +72,6 @@ if __name__ == '__main__':
     test['test_id'] = test['test_id'].apply(str)
 
     df_all = pd.concat((train, test))
-    df_all = df_all.sample(10000)
     df_all['question1'].fillna('', inplace=True)
     df_all['question2'].fillna('', inplace=True)
 
@@ -107,8 +105,3 @@ if __name__ == '__main__':
 
     features = range(train_features.shape[1])
     feature_map=["lstm_{feature}".format(feature=feature) for feature in features]
-
-    with open(args.feature_map_file, 'w') as f:
-        for i, col in enumerate(feature_map):
-            f.write('{}\t{}\tq\n'.format(i, col))
-
