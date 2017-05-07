@@ -1,0 +1,34 @@
+include Makefile
+
+
+FEATURE_NAME = h2
+LOWEST = 50
+FEATURE_TRN := $(DIR_FEATURE)/$(FEATURE_NAME).trn.h5
+FEATURE_TST := $(DIR_FEATURE)/$(FEATURE_NAME).tst.h5
+FEATURE_MAP := $(DIR_FEATURE)/$(FEATURE_NAME).fmap
+
+SUB_FEATURES := porter_interaction \
+                porter_distance \
+                porter_q1_tfidf \
+                porter_q2_tfidf \
+                porter_q1_porter_tfidf \
+                porter_q2_porter_tfidf \
+                porter_len \
+		lstm \
+		abhi
+
+
+SUB_FEATURE_TRN := $(foreach m, $(SUB_FEATURES), $(DIR_FEATURE)/train_$(m).h5)
+SUB_FEATURE_TST := $(foreach m, $(SUB_FEATURES), $(DIR_FEATURE)/test_$(m).h5)
+
+all: $(FEATURE_TRN) $(FEATURE_TST)
+
+$(FEATURE_TRN) $(FEATURE_TST): $(DATA_TRN) $(DATA_TST) | $(DIR_FEATURE) $(DIR_DATA)
+	python ./src/generate_merge.py --train-file $< \
+                                --test-file $(lastword $^) \
+                                --train-sub-features "$(SUB_FEATURE_TRN)" \
+                                --test-sub-features "$(SUB_FEATURE_TST)" \
+                                --train-feature-file $(FEATURE_TRN) \
+                                --test-feature-file $(FEATURE_TST) \
+                                --lowest $(LOWEST)
+
