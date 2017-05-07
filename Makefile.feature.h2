@@ -13,7 +13,9 @@ SUB_FEATURES := interaction \
                 q2_tfidf \
                 q1_porter_tfidf \
                 q2_porter_tfidf \
-                len
+                len \
+                magic
+
 
 
 SUB_FEATURE_TRN := $(foreach m, $(SUB_FEATURES), $(DIR_FEATURE)/train_porter_$(m).h5)
