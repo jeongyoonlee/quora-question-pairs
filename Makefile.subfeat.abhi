@@ -1,0 +1,19 @@
+# Abhishek's features https://www.kaggle.com/c/quora-question-pairs/discussion/31284
+# https://github.com/abhishekkrthakur/is_that_a_duplicate_quora_question
+include Makefile
+
+SUBFEAT_NAME = abhi
+
+ABHI_TRN = $(DIR_FEATURE)/train_features.csv
+ABHI_TST = $(DIR_FEATURE)/test_features.csv
+SUBFEAT_TRN = $(DIR_FEATURE)/train_$(SUBFEAT_NAME).h5
+SUBFEAT_TST = $(DIR_FEATURE)/test_$(SUBFEAT_NAME).h5
+
+all: $(SUBFEAT_TRN) $(SUBFEAT_TST)
+$(SUBFEAT_TRN): $(ABHI_TRN) | $(DIR_FEATURE)
+	python ./src/convert_abhi_feat.py --input $< \
+                                      --output $@
+
+$(SUBFEAT_TST): $(ABHI_TST) | $(DIR_FEATURE)
+	python ./src/convert_abhi_feat.py --input $< \
+                                      --output $@
