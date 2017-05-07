@@ -100,7 +100,7 @@ if __name__ == '__main__':
     train_features = model.extractFeatures(X1_train_all, X2_train_all)
     test_features = model.extractFeatures(X1_test, X2_test)
 
-    save_data(train_features, y_train_all, args.train_output_file)
+    save_data(train_features, None, args.train_output_file)
     save_data(test_features, None, args.test_output_file)
 
     features = range(train_features.shape[1])
