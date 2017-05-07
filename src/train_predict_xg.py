@@ -39,7 +39,7 @@ def train_predict(train_file, test_file, predict_valid_file, predict_test_file,
               'colsample_bylevel': sublev,
               'min_child_weight': weight,
               'silent': 1,
-              'nthread': 10,
+              'nthread': 20,
               'seed': SEED,
               'eval_metric': 'logloss'}
 
