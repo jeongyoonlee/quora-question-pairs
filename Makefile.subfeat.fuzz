@@ -1,0 +1,18 @@
+# Convert h1 to subfeat
+include Makefile
+
+SUBFEAT_NAME = fuzz
+
+SUBFEAT_TRN = $(DIR_FEATURE)/train_$(SUBFEAT_NAME).h5
+SUBFEAT_TST = $(DIR_FEATURE)/test_$(SUBFEAT_NAME).h5
+
+SUBFEAT_MAP := $(DIR_FEATURE)/$(SUBFEAT_NAME).fmap
+
+all: $(SUBFEAT_TRN) $(SUBFEAT_TST) $(SUBFEAT_MAP)
+
+$(SUBFEAT_TRN) $(SUBFEAT_TST): $(DATA_TRN) $(DATA_TST) | $(DIR_DATA)
+	python ./src/generate_$(SUBFEAT_NAME).py --train-file $< \
+                                             --test-file $(lastword $^) \
+                                             --train-feature-file $(SUBFEAT_TRN) \
+                                             --test-feature-file $(SUBFEAT_TST) \
+                                             --feature-map-file $(SUBFEAT_MAP)
