@@ -8,14 +8,17 @@ MODEL_NAME := $(ALGO_NAME)_$(FEATURE_NAME)
 PREDICT_VAL := $(DIR_VAL)/$(MODEL_NAME).val.yht
 PREDICT_TST := $(DIR_TST)/$(MODEL_NAME).tst.yht
 METRIC_VAL := $(DIR_METRIC)/$(MODEL_NAME).val.txt
+PREDICT_TST_FIX := $(DIR_TST)/$(MODEL_NAME).tst.fix.yht
 
 
 SUBMISSION_TST := $(DIR_SUB)/$(MODEL_NAME).sub.csv
 SUBMISSION_TST_GZ := $(DIR_SUB)/$(MODEL_NAME).sub.csv.gz
+SUBMISSION_TST_FIX := $(DIR_SUB)/$(MODEL_NAME).sub.fix.csv
 
 all: validation submission
 validation: $(METRIC_VAL)
 submission: $(SUBMISSION_TST)
+submission2: $(SUBMISSION_TST_FIX)
 retrain: clean_$(ALGO_NAME) submission
 
 $(PREDICT_TST) $(PREDICT_VAL): $(FEATURE_TRN) $(FEATURE_TST)  $(CV_ID)\
@@ -40,6 +43,15 @@ $(METRIC_VAL): $(PREDICT_VAL) $(Y_TRN) | $(DIR_METRIC)
 	python ./src/evaluate.py --predict-file $< \
                               --target-file $(word 2, $^) > $@
 	cat $@
+
+$(PREDICT_TST_FIX): $(PREDICT_TST) | $(DIR_SUB)
+	python ./src/adj_pred.py --input $< \
+                               --output $@
+
+$(SUBMISSION_TST_FIX): $(PREDICT_TST_FIX) $(HEADER) $(ID_TST) | $(DIR_SUB)
+	paste -d, $(lastword $^) $< > $@.tmp
+	cat $(word 2, $^) $@.tmp > $@
+	rm $@.tmp
 
 clean:: clean_$(ALGO_NAME)
 
