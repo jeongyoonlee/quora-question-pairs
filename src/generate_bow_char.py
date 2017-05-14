@@ -31,7 +31,7 @@ if __name__ == '__main__':
     
     bow_extractor = CountVectorizer(max_df=0.999, min_df=500, 
                                     max_features=300000, 
-                                    analyzer='char', ngram_range=(1,9), 
+                                    analyzer='char', ngram_range=(1,6), 
                                     binary=True, lowercase=True)
 
     corpus = []
