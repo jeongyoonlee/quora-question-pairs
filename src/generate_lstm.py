@@ -75,6 +75,7 @@ if __name__ == '__main__':
     df_all['question1'].fillna('', inplace=True)
     df_all['question2'].fillna('', inplace=True)
 
+    #df_all = df_all.sample(10000)
     print('Creating count vector')
     counts_vectorizer = CountVectorizer(max_features=10000 - 1).fit(
         itertools.chain(df_all['question1'], df_all['question2']))
@@ -100,8 +101,8 @@ if __name__ == '__main__':
     train_features = model.extractFeatures(X1_train_all, X2_train_all)
     test_features = model.extractFeatures(X1_test, X2_test)
 
-    save_data(train_features, y_train_all, args.train_output_file)
-    save_data(test_features, None, args.test_output_file)
+    save_data(train_features.astype(float), None, args.train_output_file)
+    save_data(test_features.astype(float), None, args.test_output_file)
 
     features = range(train_features.shape[1])
     feature_map=["lstm_{feature}".format(feature=feature) for feature in features]
