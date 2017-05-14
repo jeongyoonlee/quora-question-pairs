@@ -24,6 +24,9 @@ class PhraseVector:
     def __init__(self, phrase):
         self.vector = self.PhraseToVec(phrase)
 
+    def __init__(self, phraseArray, dummy):
+        self.vector = self.WordArrayToVec(phraseArray)
+
     # <summary> Calculates similarity between two sets of vectors based on the averages of the sets.</summary>
     # <param>name = "vectorSet" description = "An array of arrays that needs to be condensed into a single array (vector). In this class, used to convert word vecs to phrases."</param>
     # <param>name = "ignore" description = "The vectors within the set that need to be ignored. If this is an empty list, nothing is ignored. In this class, this would be stop words."</param>
@@ -40,6 +43,16 @@ class PhraseVector:
         wordsInPhrase = [word for word in phrase.split() if word not in cachedStopWords]
         vectorSet = []
         for aWord in wordsInPhrase:
+            try:
+                wordVector = model1[aWord]
+                vectorSet.append(wordVector)
+            except:
+                pass
+        return self.ConvertVectorSetToVecAverageBased(vectorSet)
+
+    def WordArrayToVec(self, wordArray):
+        vectorSet = []
+        for aWord in wordArray:
             try:
                 wordVector = model1[aWord]
                 vectorSet.append(wordVector)
