@@ -33,5 +33,5 @@ if __name__ == '__main__':
     train['intersection_count'] = train.apply(lambda row: get_intersection_count(row), axis=1)
     test['intersection_count'] = test.apply(lambda row: get_intersection_count(row), axis=1)
 
-    save_data(train['intersection_count'].values, None, args.train_output_file)
-    save_data(test['intersection_count'].values, None, args.test_output_file)
+    save_data(train[['intersection_count']].values, None, args.train_output_file)
+    save_data(test[['intersection_count']].values, None, args.test_output_file)
