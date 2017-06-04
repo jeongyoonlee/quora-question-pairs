@@ -1,0 +1,71 @@
+include Makefile.feature.h15
+
+N = 5
+BATCH_SIZE = 512
+HIDDEN = 2
+NEURON = 128
+DROPOUT = 0.5
+N_STOP = 5
+ALGO_NAME := keras_$(N)_$(HIDDEN)_$(NEURON)_$(DROPOUT)_$(BATCH_SIZE)_$(N_STOP)
+MODEL_NAME := $(ALGO_NAME)_$(FEATURE_NAME)
+
+PREDICT_VAL := $(DIR_VAL)/$(MODEL_NAME).val.yht
+PREDICT_TST := $(DIR_TST)/$(MODEL_NAME).tst.yht
+PREDICT_TST_FIX := $(DIR_TST)/$(MODEL_NAME).tst.fix.yht
+METRIC_VAL := $(DIR_METRIC)/$(MODEL_NAME).val.txt
+
+SUBMISSION_TST := $(DIR_SUB)/$(MODEL_NAME).sub.csv
+SUBMISSION_TST_FIX := $(DIR_SUB)/$(MODEL_NAME).sub.fix.csv
+SUBMISSION_TST_GZ := $(DIR_SUB)/$(MODEL_NAME).sub.csv.gz
+
+all: validation submission
+validation: $(METRIC_VAL)
+submission: $(SUBMISSION_TST)
+submission2: $(SUBMISSION_TST_FIX)
+retrain: clean_$(ALGO_NAME) submission
+
+$(PREDICT_TST) $(PREDICT_VAL): $(FEATURE_TRN) $(FEATURE_TST) $(CV_ID) \
+                                   | $(DIR_VAL) $(DIR_TST)
+	python ./src/train_predict_keras.py --train-file $< \
+                              --test-file $(word 2, $^) \
+                              --predict-valid-file $(PREDICT_VAL) \
+                              --predict-test-file $(PREDICT_TST) \
+                              --batch-size $(BATCH_SIZE) \
+                              --n-est $(N) \
+                              --hiddens $(HIDDEN) \
+                              --neurons $(NEURON) \
+                              --dropout $(DROPOUT) \
+                              --early-stopping $(N_STOP) \
+                              --cv-id $(lastword $^)
+
+$(SUBMISSION_TST_GZ): $(SUBMISSION_TST)
+	gzip $<
+
+$(SUBMISSION_TST): $(PREDICT_TST) $(PREDICT_VAL) $(Y_TRN) | $(DIR_TST)
+	python ./src/submission.py --predict-file $(word 2, $^) \
+                                --target-file $(word 3, $^) \
+                                --tst-predict-file $< \
+                                --submission-file $@ \
+                                --sample-submission $(SAMPLE_SUBMISSION)
+
+$(METRIC_VAL): $(PREDICT_VAL) $(Y_TRN) | $(DIR_METRIC)
+	python ./src/evaluate.py --predict-file $< \
+                             --target-file $(word 2, $^) > $@
+	cat $@
+
+$(PREDICT_TST_FIX): $(PREDICT_TST) | $(DIR_SUB)
+	python ./src/adj_pred.py --input $< \
+                               --output $@
+
+$(SUBMISSION_TST_FIX): $(PREDICT_TST_FIX) $(HEADER) $(ID_TST) | $(DIR_SUB)
+	paste -d, $(lastword $^) $< > $@.tmp
+	cat $(word 2, $^) $@.tmp > $@
+	rm $@.tmp
+
+clean:: clean_$(ALGO_NAME)
+
+clean_$(ALGO_NAME):
+	-rm $(METRIC_VAL) $(PREDICT_VAL) $(PREDICT_TST) $(SUBMISSION_TST)
+	find . -name '*.pyc' -delete
+
+.DEFAULT_GOAL := all
