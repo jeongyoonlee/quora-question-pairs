@@ -34,6 +34,6 @@ if __name__ == '__main__':
     print X.shape
 
     logging.info('saving features')
-    save_data(X1[:len(y_train),:], y_train, args.train_feature_file)
-    save_data(X1[len(y_train):,:], None, args.test_feature_file)
+    save_data(X[:len(y_train),:], y_train, args.train_feature_file)
+    save_data(X[len(y_train):,:], None, args.test_feature_file)
     
