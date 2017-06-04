@@ -1,0 +1,22 @@
+include Makefile
+
+
+FEATURE_NAME = m5
+FEATURE_TRN := $(DIR_FEATURE)/$(FEATURE_NAME).trn.h5
+FEATURE_TST := $(DIR_FEATURE)/$(FEATURE_NAME).tst.h5
+FEATURE_MAP := $(DIR_FEATURE)/$(FEATURE_NAME).fmap
+
+RAW_FILE1 := $(DIR_FEATURE)/song_m5_feature1.pkl
+RAW_FILE2 := $(DIR_FEATURE)/song_m5_feature2.pkl
+
+all: $(FEATURE_TRN) $(FEATURE_TST)
+
+$(FEATURE_TRN) $(FEATURE_TST): $(DATA_TRN) $(RAW_FILE1) $(RAW_FILE2) | $(DIR_FEATURE) $(DIR_DATA)
+	python ./src/convert_s_features.py --train-file $< \
+                                --input-file1 $(word 2, $^) \
+                                --input-file2 $(lastword $^) \
+                                --train-feature-file $(FEATURE_TRN) \
+                                --test-feature-file $(FEATURE_TST) 
+                                             
+
+
