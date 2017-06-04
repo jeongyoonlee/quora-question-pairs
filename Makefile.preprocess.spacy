@@ -1,0 +1,14 @@
+include Makefile
+
+PROCESS_NAME := spacy
+
+DATA_TRN_PRE = $(DIR_DATA)/train_$(PROCESS_NAME).csv
+DATA_TST_PRE = $(DIR_DATA)/test_$(PROCESS_NAME).csv
+
+all: $(DATA_TRN_PRE) $(DATA_TST_PRE)
+
+$(DATA_TRN_PRE) $(DATA_TST_PRE): $(DATA_TRN) $(DATA_TST) |$(DIR_DATA)
+	python ./src/generate_spacy_ner.py --train-file $< \
+                                  --test-file $(word 2, $^) \
+                                  --train-output-file $(DATA_TRN_PRE) \
+                                  --test-output-file $(DATA_TST_PRE)
