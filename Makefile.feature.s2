@@ -1,0 +1,33 @@
+include Makefile
+
+
+FEATURE_NAME = s2
+LOWEST = 50
+FEATURE_TRN := $(DIR_FEATURE)/$(FEATURE_NAME).trn.h5
+FEATURE_TST := $(DIR_FEATURE)/$(FEATURE_NAME).tst.h5
+FEATURE_MAP := $(DIR_FEATURE)/$(FEATURE_NAME).fmap
+
+SUB_FEATURES := j7 \
+                porter_kcore \
+                porter_magic2 \
+                porter_magic_ic2 \
+                spacy_magic2 \
+                spacy_magic_ic2 \
+                porter_pos
+
+SUB_FEATURE_TRN := $(foreach m, $(SUB_FEATURES), $(DIR_FEATURE)/train_$(m).h5)
+SUB_FEATURE_TST := $(foreach m, $(SUB_FEATURES), $(DIR_FEATURE)/test_$(m).h5)
+
+all: $(FEATURE_TRN) $(FEATURE_TST)
+
+$(FEATURE_TRN) $(FEATURE_TST): $(DATA_TRN) $(DATA_TST) | $(DIR_FEATURE) $(DIR_DATA)
+	python ./src/generate_merge.py --train-file $< \
+                                --test-file $(lastword $^) \
+                                --train-sub-features "$(SUB_FEATURE_TRN)" \
+                                --test-sub-features "$(SUB_FEATURE_TST)" \
+                                --train-feature-file $(FEATURE_TRN) \
+                                --test-feature-file $(FEATURE_TST) \
+                                --lowest $(LOWEST)
+                                             
+
+
