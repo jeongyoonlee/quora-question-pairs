@@ -16,9 +16,9 @@ PREDICT_TST := $(DIR_TST)/$(MODEL_NAME).tst.yht
 PREDICT_TST_FIX := $(DIR_TST)/$(MODEL_NAME).tst.fix.yht
 METRIC_VAL := $(DIR_METRIC)/$(MODEL_NAME).val.txt
 
-SUBMISSION_TST := $(DIR_TST)/$(MODEL_NAME).sub.csv
+SUBMISSION_TST := $(DIR_SUB)/$(MODEL_NAME).sub.csv
 SUBMISSION_TST_FIX := $(DIR_SUB)/$(MODEL_NAME).sub.fix.csv
-SUBMISSION_TST_GZ := $(DIR_TST)/$(MODEL_NAME).sub.csv.gz
+SUBMISSION_TST_GZ := $(DIR_SUB)/$(MODEL_NAME).sub.csv.gz
 
 all: validation submission
 validation: $(METRIC_VAL)
